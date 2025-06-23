@@ -61,42 +61,48 @@ def make_tags(title, abstract, top_n=5):
 def scrape(max_results=MAX_RESULTS, **criteria):
     query  = build_query(**criteria)
     search = arxiv.Search(query=query,
-                          max_results=max_results,
+                          max_results=max_results * 3,  # Get more results to filter from
                           sort_by=arxiv.SortCriterion.SubmittedDate)
 
     conn = get_conn()
-    scraped_papers = []  # Track papers that were just scraped
+    search_results = []  # Track papers from current search that aren't in database
+    papers_added = 0
     
     for p in search.results():
-        tags = make_tags(p.title, p.summary)
-        
-        # Check if paper already exists
+        # Check if paper already exists in database
         existing = conn.execute("SELECT id FROM papers WHERE id=?", (p.entry_id,)).fetchone()
         
-        conn.execute(
-            "INSERT OR IGNORE INTO papers VALUES (?,?,?,?,?,?,?)",
-            (
-                p.entry_id,
-                p.title,
-                ", ".join(a.name for a in p.authors),
-                p.summary,
-                p.published.isoformat(),
-                None,          # summary placeholder
-                tags
-            ),
-        )
-        
-        # If paper was newly inserted (not ignored), add to scraped_papers
-        if not existing:
-            scraped_papers.append({
+        if not existing and papers_added < max_results:
+            # Paper doesn't exist, add it
+            tags = make_tags(p.title, p.summary)
+            conn.execute(
+                "INSERT INTO papers VALUES (?,?,?,?,?,?,?)",
+                (
+                    p.entry_id,
+                    p.title,
+                    ", ".join(a.name for a in p.authors),
+                    p.summary,
+                    p.published.isoformat(),
+                    None,          #  ummary placeholder
+                    tags
+                ),
+            )
+            
+            # Add to search results
+            search_results.append({
                 'title': p.title,
                 'authors': ", ".join(a.name for a in p.authors),
                 'abstract': p.summary,
                 'published': p.published.isoformat()
             })
+            papers_added += 1
         
+        # Stop if enough papers have been added
+        if papers_added >= max_results:
+            break
+            
         time.sleep(1)
-    conn.commit()
     
-    return scraped_papers
+    conn.commit()
+    return search_results
 

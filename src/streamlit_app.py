@@ -37,7 +37,7 @@ tab1, tab2, tab3 = st.tabs(["🔍 Search", "📑 Digest", "💡 Ideate"])
 
 
 with tab1:
-    st.header("Search papers")
+    st.header("Search for papers you have not yet read")
     c1, c2, c3, c4 = st.columns(4)
     topic    = c1.text_input("Topic")
     title    = c2.text_input("Title")
@@ -45,18 +45,18 @@ with tab1:
     category = c4.text_input("Category (e.g. cs.CL)")
     k = st.slider("Max papers", 5, 50, 25)
     if st.button("Run search"):
-        with st.spinner("Scraping papers, and storing them..."):
-            scraped_papers = scrape(max_results=k, topic=topic, title=title,
+        with st.spinner("Finding new papers for your search..."):
+            search_results = scrape(max_results=k, topic=topic, title=title,
                author=author, category=category)
-        st.success("All done!")
         
-        if scraped_papers:
-            # Convert scraped papers to the format expected by render_rows
+        if search_results:
+            st.success(f"Found {len(search_results)} new papers for your search!")
+            # Convert search results to the format expected by render_rows
             paper_rows = [(p['title'], p['authors'], p['abstract'], p['published']) 
-                         for p in scraped_papers]
+                         for p in search_results]
             st.components.v1.html(render_rows(paper_rows), height=600, scrolling=True)
         else:
-            st.info("No new papers were found. All papers from this search already exist in the database.")
+            st.info("No new papers found for this search. All recent papers on this topic are already in your database.")
 
 
 with tab2:
@@ -95,6 +95,6 @@ with tab3:
                 ideas = ideate_from_ids(ids)
             if ideas is None:
                 st.info("Those IDs aren't in the database yet. "
-                        "Fetch them via the **Search** tab, then try again.")
+                        "Fetch them via the Search tab, then try again.")
             else:
                 st.markdown(f"```\n{ideas}\n```")
