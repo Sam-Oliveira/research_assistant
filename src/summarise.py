@@ -2,7 +2,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from db import get_conn
 from config import MODEL_NAME
 from helpers    import rows_by_tag 
-
+import os
+import tempfile
+import pathlib
 """ 
 Summarise the abstract of a paper using a LLM. Further versions should instead summarise the full paper.
 """
@@ -16,12 +18,14 @@ PROMPT = (
 
 # ---------------------------------------------------------------------- #
 def load_pipe():
+    cache_dir = pathlib.Path(tempfile.gettempdir()) / "hf_cache"
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME, 
-        #load_in_4bit=True, 
+        cache_dir=cache_dir,
+        load_in_4bit=True, 
         device_map="auto"
     )
-    tok   = AutoTokenizer.from_pretrained(MODEL_NAME)
+    tok   = AutoTokenizer.from_pretrained(MODEL_NAME, cache_dir=cache_dir)
     tok.pad_token = tok.eos_token
     return pipeline(
         "text-generation",

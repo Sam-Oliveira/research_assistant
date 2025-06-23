@@ -1,7 +1,7 @@
 from pathlib import Path
 import pathlib,tempfile
 # Root folder for DB
-#PROJ = Path(__file__).parent # For MAC
+#PROJ = Path(__file__).parent # For MAC
 PROJ = pathlib.Path(tempfile.gettempdir()) # For Space
 MAX_RESULTS  = 10 #default number of results
 
