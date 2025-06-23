@@ -46,15 +46,17 @@ with tab1:
     k = st.slider("Max papers", 5, 50, 25)
     if st.button("Run search"):
         with st.spinner("Scraping papers, and storing them..."):
-            scrape(max_results=k, topic=topic, title=title,
+            scraped_papers = scrape(max_results=k, topic=topic, title=title,
                author=author, category=category)
         st.success("All done!")
-        from db import get_conn
-        newest = get_conn().execute(
-            "SELECT title, authors, abstract, published FROM papers "
-            "ORDER BY published DESC LIMIT ?", (k,)
-        ).fetchall()
-        st.components.v1.html(render_rows(newest), height=600, scrolling=True)
+        
+        if scraped_papers:
+            # Convert scraped papers to the format expected by render_rows
+            paper_rows = [(p['title'], p['authors'], p['abstract'], p['published']) 
+                         for p in scraped_papers]
+            st.components.v1.html(render_rows(paper_rows), height=600, scrolling=True)
+        else:
+            st.info("No new papers were found. All papers from this search already exist in the database.")
 
 
 with tab2:
@@ -92,7 +94,7 @@ with tab3:
                 ids   = [x.strip() for x in ids_in.split(",") if x.strip()]
                 ideas = ideate_from_ids(ids)
             if ideas is None:
-                st.info("Those IDs aren’t in the database yet. "
+                st.info("Those IDs aren't in the database yet. "
                         "Fetch them via the **Search** tab, then try again.")
             else:
                 st.markdown(f"```\n{ideas}\n```")

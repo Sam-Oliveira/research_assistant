@@ -28,7 +28,6 @@ st_model = SentenceTransformer(
 kw_model = KeyBERT(st_model)
 
 """
-
 # For my Mac
 from sentence_transformers import SentenceTransformer
 from keybert import KeyBERT
@@ -66,8 +65,14 @@ def scrape(max_results=MAX_RESULTS, **criteria):
                           sort_by=arxiv.SortCriterion.SubmittedDate)
 
     conn = get_conn()
+    scraped_papers = []  # Track papers that were just scraped
+    
     for p in search.results():
         tags = make_tags(p.title, p.summary)
+        
+        # Check if paper already exists
+        existing = conn.execute("SELECT id FROM papers WHERE id=?", (p.entry_id,)).fetchone()
+        
         conn.execute(
             "INSERT OR IGNORE INTO papers VALUES (?,?,?,?,?,?,?)",
             (
@@ -80,6 +85,18 @@ def scrape(max_results=MAX_RESULTS, **criteria):
                 tags
             ),
         )
+        
+        # If paper was newly inserted (not ignored), add to scraped_papers
+        if not existing:
+            scraped_papers.append({
+                'title': p.title,
+                'authors': ", ".join(a.name for a in p.authors),
+                'abstract': p.summary,
+                'published': p.published.isoformat()
+            })
+        
         time.sleep(1)
     conn.commit()
+    
+    return scraped_papers
 
