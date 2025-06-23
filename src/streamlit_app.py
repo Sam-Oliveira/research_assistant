@@ -56,7 +56,7 @@ with tab2:
     if st.button("Generate digest"):
         with st.spinner("Finding papers and summarising them..."):
             summarise_by_tag(d_topic)
-            rows = rows_by_tag(d_topic, MAX_RESULTS)
+    rows = rows_by_tag(d_topic, MAX_RESULTS)
     if not rows:
         st.info("No papers found; try the Search tab.")
     else:
