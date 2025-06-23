@@ -22,7 +22,7 @@ def load_pipe():
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME, 
         cache_dir=cache_dir,
-        load_in_4bit=True, 
+        #load_in_4bit=True, 
         device_map="auto"
     )
     tok   = AutoTokenizer.from_pretrained(MODEL_NAME, cache_dir=cache_dir)
