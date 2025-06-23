@@ -1,0 +1,11 @@
+streamlit
+arxiv
+transformers
+accelerate
+bitsandbytes
+torch          
+feedparser 
+sqlite-utils 
+fastapi 
+uvicorn
+tiktoken
