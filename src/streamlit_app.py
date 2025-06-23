@@ -48,7 +48,7 @@ with tab1:
         ).fetchall()
         st.components.v1.html(render_rows(newest), height=600, scrolling=True)
 
-# ───────── TAB 2 – Digest (unchanged) ─────────────────────────────
+
 with tab2:
     st.header("Digest from local DB")
     d_topic = st.text_input("Keyword to match tags", value="large language")
@@ -57,7 +57,6 @@ with tab2:
         rows = rows_by_tag(d_topic, MAX_RESULTS)
         st.components.v1.html(render_rows(rows), height=800, scrolling=True)
 
-# ───────── TAB 3 – Ideate (new feedback) ──────────────────────────
 with tab3:
     st.header("Brainstorm new research ideas")
     mode = st.radio("Context source", ["Keyword", "ArXiv IDs"])

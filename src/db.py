@@ -12,7 +12,8 @@ def get_conn():
             authors   TEXT,
             abstract  TEXT,
             published TEXT,
-            summary   TEXT
+            summary   TEXT,
+            tags      TEXT
         )
         """
     )

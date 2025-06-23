@@ -4,7 +4,7 @@ from db import get_conn
 from config import MAX_RESULTS
 from keybert import KeyBERT
 
-_kw = KeyBERT("all-MiniLM-L6-v2")   # ~90 MB, load once
+_kw = KeyBERT()
 
 def make_tags(title, abstract, top_n=5):
     """
