@@ -8,8 +8,16 @@ Streamlit app for the research assistant.
 """
 import pathlib, tempfile
 import os
+CACHE_DIR = pathlib.Path(tempfile.gettempdir()) / "hf_cache"
 os.environ["XDG_CACHE_HOME"] = str(pathlib.Path(tempfile.gettempdir()) / "hf_cache")
-
+for var in (
+    "HF_HOME",
+    "HF_HUB_CACHE",
+    "TRANSFORMERS_CACHE",
+    "SENTENCE_TRANSFORMERS_HOME",
+):
+    os.environ[var] = str(CACHE_DIR)
+    
 import streamlit as st
 import html as ihtml
 from datetime import date
