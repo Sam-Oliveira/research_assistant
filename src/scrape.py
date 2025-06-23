@@ -6,23 +6,16 @@ from keybert import KeyBERT
 import os
 import pathlib
 
-# 1) Prefer /data if it exists (HF Spaces), else ~/.cache, else /tmp
-if pathlib.Path("/data").exists():
-    CACHE_DIR = pathlib.Path("/data") / "hf_cache"
-else:
-    CACHE_DIR = pathlib.Path.home() / ".cache" / "hf_cache"
-
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
-
-# 2) Tell all HF-related libs to use that folder
-os.environ["HF_HOME"]                     = str(CACHE_DIR)
-os.environ["HF_HUB_CACHE"]                = str(CACHE_DIR)
-os.environ["TRANSFORMERS_CACHE"]          = str(CACHE_DIR)
-os.environ["SENTENCE_TRANSFORMERS_HOME"]  = str(CACHE_DIR)
+os.environ["HF_HOME"]                    = "/data"
+os.environ["HF_HUB_CACHE"]               = "/data"
+os.environ["TRANSFORMERS_CACHE"]         = "/data"
+os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/data"
 
 
-_kw = KeyBERT("sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"cache_folder": str(CACHE_DIR)})
+_kw = KeyBERT(
+    "sentence-transformers/all-MiniLM-L6-v2",
+    model_kwargs={"cache_folder": "/data"}   # <- same writable path
+)
 
 def make_tags(title, abstract, top_n=5):
     """
