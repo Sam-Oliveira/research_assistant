@@ -8,7 +8,7 @@ Example:
 build_html(lookback_hours=48)
 """
 
-def build_html(lookback_hours=72):
+def build_html():
     today = datetime.date.today().isoformat()
     
     conn = get_conn()

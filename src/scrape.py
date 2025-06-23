@@ -4,7 +4,7 @@ from db import get_conn
 from config import MAX_RESULTS
 import os, pathlib, tempfile,uuid, shutil
 
-
+# set-up code for huggingface spaces
 CACHE_DIR = pathlib.Path(tempfile.gettempdir()) / "hf_cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)      # guaranteed writable
 

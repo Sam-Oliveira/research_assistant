@@ -22,7 +22,6 @@ def load_pipe():
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME, 
         cache_dir=cache_dir,
-        #load_in_4bit=True, 
         device_map="auto"
     )
     tok   = AutoTokenizer.from_pretrained(MODEL_NAME, cache_dir=cache_dir)
@@ -54,9 +53,9 @@ def summarise_by_tag(keyword: str, limit: int = 10) -> int:
     ).fetchall()
 
     # 2) run the LLM only on those
-    for pid, abstract in rows:
+    for id, abstract in rows:
         out = pipe(PROMPT.format(abstract=abstract), max_new_tokens=150)[0]['generated_text']
-        conn.execute("UPDATE papers SET summary=? WHERE id=?", (out.strip(), pid))
+        conn.execute("UPDATE papers SET summary=? WHERE id=?", (out.strip(), id))
 
     conn.commit()
     return len(rows)

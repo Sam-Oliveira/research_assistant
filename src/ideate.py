@@ -17,12 +17,12 @@ IDEA_PROMPT = (
 # ---------------------------------------------------------------------- #
 def ideate_from_topic(topic: str, k: int = 8) -> Optional[str]:
     rows = rows_by_tag(topic, k)
-    if not rows:                   # <- nothing in DB
+    if not rows:
         return None
 
     ctx  = "\n".join(f"- {t}: {s}" for t, _, s, _ in rows)
     llm  = load_pipe()
-    return llm(IDEA_PROMPT.format(context=ctx), max_new_tokens=300,
+    return llm(IDEA_PROMPT.format(context=ctx),
                do_sample=False)[0]['generated_text'].strip()
 
 # ------------------------------------------------------------------ #
@@ -37,9 +37,9 @@ def ideate_from_ids(ids: List[str]) -> Optional[str]:
         if row:
             ctx.append(f"- {row[0]}: {row[1]}")
 
-    if not ctx:                          # <- none of the IDs are in DB
+    if not ctx:
         return None
 
     llm = load_pipe()
-    return llm(IDEA_PROMPT.format(context="\n".join(ctx)), max_new_tokens=500,
+    return llm(IDEA_PROMPT.format(context="\n".join(ctx)),
                do_sample=False)[0]['generated_text'].strip()

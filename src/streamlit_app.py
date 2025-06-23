@@ -21,7 +21,6 @@ for var in (
     os.environ[var] = str(CACHE_DIR)
     
 import streamlit as st
-import html as ihtml
 from datetime import date
 from config     import MAX_RESULTS
 from scrape     import scrape
@@ -31,10 +30,7 @@ from helpers    import render_rows, rows_by_tag
 from db         import get_conn
 from summarise     import summarise_by_tag
 
-#def install(package):
- #   subprocess.check_call([os.sys.executable, "-m", "pip", "install", package])
 
-#install("arxiv")
 
 st.set_page_config(page_title="Research Assistant", layout="wide")
 tab1, tab2, tab3 = st.tabs(["🔍 Search", "📑 Digest", "💡 Ideate"])

@@ -10,7 +10,7 @@ def render_rows(rows):
     """
     blocks = []
     for t, a, txt, pub in rows:
-        # Handle None values by converting them to empty strings
+        #Handle None values by converting to empty strings
         title = html.escape(t) if t is not None else ""
         authors = html.escape(a) if a is not None else ""
         summary = html.escape(txt) if txt is not None else ""
