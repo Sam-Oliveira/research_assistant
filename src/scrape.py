@@ -16,6 +16,8 @@ for var in (
 ):
     os.environ[var] = str(CACHE_DIR)
 
+os.environ["XDG_CACHE_HOME"] = str(pathlib.Path(tempfile.gettempdir()) / ".cache")
+
 from sentence_transformers import SentenceTransformer
 from keybert import KeyBERT
 
