@@ -6,7 +6,7 @@ from typing import Optional,List
 from helpers   import rows_by_tag
 
 IDEA_PROMPT = (
-   " You are a senior ML researcher. Using the CONTEXT, propose THREE fresh research projects."
+   " You are a senior ML researcher. For each of the papers in CONTEXT, propose THREE fresh research projects."
     "For each give a new **Title**, one-sentence **Motivation**, two-sentence **Method idea**, "
     "and one-sentence **Evaluation method**.\n"
     "===CONTEXT===\n"
