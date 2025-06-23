@@ -2,23 +2,34 @@ import time, arxiv
 from query_builder import build_query
 from db import get_conn
 from config import MAX_RESULTS
-from keybert import KeyBERT
 import os
 import pathlib
+import os, pathlib, uuid, shutil
+
+BASE_CACHE = pathlib.Path("/data")              # always writable in Spaces
+CACHE_DIR  = BASE_CACHE / "hf_cache" / str(os.getpid())
+
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+# 1) Point every HF-related lib there
+os.environ["HF_HOME"]                    = str(CACHE_DIR)
+os.environ["HF_HUB_CACHE"]               = str(CACHE_DIR)
+os.environ["TRANSFORMERS_CACHE"]         = str(CACHE_DIR)
+os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(CACHE_DIR)
+
+# 2) Remove any stale lock that might have been copied along
+lock_file = CACHE_DIR / ".lock"
+if lock_file.exists():
+    lock_file.unlink()
+
+# 3) Now import and load the model safely
 from sentence_transformers import SentenceTransformer
-
-os.environ["HF_HOME"]                    = "/data"
-os.environ["HF_HUB_CACHE"]               = "/data"
-os.environ["TRANSFORMERS_CACHE"]         = "/data"
-os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/data"
-
+from keybert import KeyBERT
 
 st_model = SentenceTransformer(
     "sentence-transformers/all-MiniLM-L6-v2",
-    cache_folder="/data"                 # <- writable
+    cache_folder=str(CACHE_DIR)
 )
-
-# 2) Hand it to KeyBERT
 kw_model = KeyBERT(st_model)
 
 def make_tags(title, abstract, top_n=5):
