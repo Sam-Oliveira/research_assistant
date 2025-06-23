@@ -20,10 +20,10 @@ import os
 import subprocess
 from summarise     import summarise_by_tag
 
-def install(package):
-    subprocess.check_call([os.sys.executable, "-m", "pip", "install", package])
+#def install(package):
+ #   subprocess.check_call([os.sys.executable, "-m", "pip", "install", package])
 
-install("arxiv")
+#install("arxiv")
 
 st.set_page_config(page_title="Research Assistant", layout="wide")
 tab1, tab2, tab3 = st.tabs(["🔍 Search", "📑 Digest", "💡 Ideate"])
