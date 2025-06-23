@@ -17,6 +17,13 @@ from digest     import build_html
 from ideate     import ideate_from_topic, ideate_from_ids
 from helpers    import render_rows, rows_by_tag
 from db         import get_conn
+import os
+import subprocess
+
+def install(package):
+    subprocess.check_call([os.sys.executable, "-m", "pip", "install", package])
+
+install("arxiv")
 
 st.set_page_config(page_title="Literature Scout", layout="wide")
 tab1, tab2, tab3 = st.tabs(["🔍 Search", "📑 Digest", "💡 Ideate"])

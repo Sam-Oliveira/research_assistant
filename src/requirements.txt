@@ -9,3 +9,6 @@ sqlite-utils
 fastapi 
 uvicorn
 tiktoken
+keybert
+sentence-transformers
+scikit-learn
