@@ -12,7 +12,6 @@ import html as ihtml
 from datetime import date
 from config     import MAX_RESULTS
 from scrape     import scrape
-from summarise  import summarise_pending
 from digest     import build_html
 from ideate     import ideate_from_topic, ideate_from_ids
 from helpers    import render_rows, rows_by_tag
@@ -39,9 +38,10 @@ with tab1:
     category = c4.text_input("Category (e.g. cs.CL)")
     k = st.slider("Max papers", 5, 50, 25)
     if st.button("Run search"):
-        scrape(max_results=k, topic=topic, title=title,
+        with st.spinner("Scraping papers, and storing them..."):
+            scrape(max_results=k, topic=topic, title=title,
                author=author, category=category)
-        st.success("Scraped, tagged, stored!")
+        st.success("All done!")
         from db import get_conn
         newest = get_conn().execute(
             "SELECT title, authors, abstract, published FROM papers "
@@ -54,8 +54,12 @@ with tab2:
     st.header("Get a digest from the latest papers you have previously scraped")
     d_topic = st.text_input("Keyword to match tags", value="large language")
     if st.button("Generate digest"):
-        summarise_by_tag(d_topic)
-        rows = rows_by_tag(d_topic, MAX_RESULTS)
+        with st.spinner("Finding papers and summarising them..."):
+            summarise_by_tag(d_topic)
+            rows = rows_by_tag(d_topic, MAX_RESULTS)
+    if not rows:
+        st.info("No papers found; try the Search tab.")
+    else:
         st.components.v1.html(render_rows(rows), height=800, scrolling=True)
 
 with tab3:
@@ -65,7 +69,8 @@ with tab3:
     if mode == "Keyword":
         kw = st.text_input("Keyword")
         if st.button("Ideate"):
-            ideas = ideate_from_topic(kw)
+            with st.spinner("Thinking of new ideas..."):
+                ideas = ideate_from_topic(kw)
             if ideas is None:
                 st.info("No papers in the database match that keyword. "
                         "Try running a search in the **Search** tab first.")
@@ -76,8 +81,9 @@ with tab3:
         ids_in = st.text_area("Comma-separated IDs",
                               placeholder="2406.01234,2405.01234")
         if st.button("Ideate"):
-            ids   = [x.strip() for x in ids_in.split(",") if x.strip()]
-            ideas = ideate_from_ids(ids)
+            with st.spinner("Thinking of new ideas..."):
+                ids   = [x.strip() for x in ids_in.split(",") if x.strip()]
+                ideas = ideate_from_ids(ids)
             if ideas is None:
                 st.info("Those IDs aren’t in the database yet. "
                         "Fetch them via the **Search** tab, then try again.")

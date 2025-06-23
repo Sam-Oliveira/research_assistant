@@ -2,41 +2,56 @@ import time, arxiv
 from query_builder import build_query
 from db import get_conn
 from config import MAX_RESULTS
-import os
-import pathlib
-import os, pathlib, uuid, shutil
+import os, pathlib, tempfile,uuid, shutil
 
-BASE_CACHE = pathlib.Path("/data")              # always writable in Spaces
-CACHE_DIR  = BASE_CACHE / "hf_cache" / str(os.getpid())
 
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
+CACHE_DIR = pathlib.Path(tempfile.gettempdir()) / "hf_cache"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)      # guaranteed writable
 
-# 1) Point every HF-related lib there
-os.environ["HF_HOME"]                    = str(CACHE_DIR)
-os.environ["HF_HUB_CACHE"]               = str(CACHE_DIR)
-os.environ["TRANSFORMERS_CACHE"]         = str(CACHE_DIR)
-os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(CACHE_DIR)
+for var in (
+    "HF_HOME",
+    "HF_HUB_CACHE",
+    "TRANSFORMERS_CACHE",
+    "SENTENCE_TRANSFORMERS_HOME",
+):
+    os.environ[var] = str(CACHE_DIR)
 
-# 2) Remove any stale lock that might have been copied along
-lock_file = CACHE_DIR / ".lock"
-if lock_file.exists():
-    lock_file.unlink()
-
-# 3) Now import and load the model safely
 from sentence_transformers import SentenceTransformer
 from keybert import KeyBERT
 
 st_model = SentenceTransformer(
     "sentence-transformers/all-MiniLM-L6-v2",
-    cache_folder=str(CACHE_DIR)
+    cache_folder=str(CACHE_DIR)          # explicit path
 )
 kw_model = KeyBERT(st_model)
+
+"""
+
+# For my Mac
+from sentence_transformers import SentenceTransformer
+from keybert import KeyBERT
+# Use a writable cache directory on macOS
+cache_dir = os.path.expanduser("~/cache")
+os.makedirs(cache_dir, exist_ok=True)
+
+os.environ["HF_HOME"]                    = cache_dir
+os.environ["HF_HUB_CACHE"]               = cache_dir
+os.environ["TRANSFORMERS_CACHE"]         = cache_dir
+os.environ["SENTENCE_TRANSFORMERS_HOME"] = cache_dir
+
+
+st_model = SentenceTransformer(
+    "sentence-transformers/all-MiniLM-L6-v2",
+    cache_folder=cache_dir                 # <- writable
+)
+kw_model = KeyBERT(st_model)
+"""
 
 def make_tags(title, abstract, top_n=5):
     """
     Extract keywords from the title and abstract using KeyBERT.
     """
-    phrases = _kw.extract_keywords(f"{title}. {abstract}",
+    phrases = kw_model.extract_keywords(f"{title}. {abstract}",
                                    top_n=top_n,
                                    stop_words="english",
                                    use_mmr=True)
