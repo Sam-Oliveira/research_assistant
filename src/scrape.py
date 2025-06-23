@@ -3,8 +3,19 @@ from query_builder import build_query
 from db import get_conn
 from config import MAX_RESULTS
 from keybert import KeyBERT
+import os
+import pathlib
+CACHE_DIR = pathlib.Path(__file__).parent / "hf_cache"
+CACHE_DIR.mkdir(exist_ok=True)
 
-_kw = KeyBERT()
+os.environ["HF_HOME"]           = str(CACHE_DIR)   # Hugging Face hub
+os.environ["HF_HUB_CACHE"]      = str(CACHE_DIR)
+os.environ["TRANSFORMERS_CACHE"] = str(CACHE_DIR)
+os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(CACHE_DIR)
+
+
+_kw = KeyBERT("sentence-transformers/all-MiniLM-L6-v2",
+    model_kwargs={"cache_folder": str(CACHE_DIR)})
 
 def make_tags(title, abstract, top_n=5):
     """
