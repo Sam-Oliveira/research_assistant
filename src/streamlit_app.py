@@ -19,6 +19,9 @@ from db         import get_conn
 import os
 import subprocess
 from summarise     import summarise_by_tag
+import pathlib, tempfile
+
+os.environ["XDG_CACHE_HOME"] = str(pathlib.Path(tempfile.gettempdir()) / "hf_cache")
 
 #def install(package):
  #   subprocess.check_call([os.sys.executable, "-m", "pip", "install", package])
