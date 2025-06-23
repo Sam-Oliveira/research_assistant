@@ -7,6 +7,7 @@ Streamlit app for the research assistant.
 
 """
 import pathlib, tempfile
+import os
 os.environ["XDG_CACHE_HOME"] = str(pathlib.Path(tempfile.gettempdir()) / "hf_cache")
 
 import streamlit as st
@@ -18,8 +19,6 @@ from digest     import build_html
 from ideate     import ideate_from_topic, ideate_from_ids
 from helpers    import render_rows, rows_by_tag
 from db         import get_conn
-import os
-import subprocess
 from summarise     import summarise_by_tag
 
 #def install(package):
