@@ -18,14 +18,16 @@ PROMPT = (
 
 # ---------------------------------------------------------------------- #
 def load_pipe():
+    # Cache directories are already set up in streamlit_app.py
     cache_dir = pathlib.Path(tempfile.gettempdir()) / "hf_cache"
+    
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME, 
-        cache_dir=cache_dir,
-        #load_in_4bit=True, 
+        cache_dir=str(cache_dir),
+        load_in_4bit=True, 
         device_map="auto"
     )
-    tok   = AutoTokenizer.from_pretrained(MODEL_NAME, cache_dir=cache_dir)
+    tok   = AutoTokenizer.from_pretrained(MODEL_NAME, cache_dir=str(cache_dir))
     tok.pad_token = tok.eos_token
     return pipeline(
         "text-generation",

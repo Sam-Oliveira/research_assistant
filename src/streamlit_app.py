@@ -15,6 +15,7 @@ for var in (
     "HF_HUB_CACHE",
     "TRANSFORMERS_CACHE",
     "SENTENCE_TRANSFORMERS_HOME",
+    "TRITON_CACHE_DIR",
 ):
     os.environ[var] = str(CACHE_DIR)
     
