@@ -8,6 +8,7 @@ Streamlit app for the research assistant.
 """
 import pathlib, tempfile
 import os
+# set up for Hugging Face Spaces
 CACHE_DIR = pathlib.Path(tempfile.gettempdir()) / "hf_cache"
 os.environ["XDG_CACHE_HOME"] = str(pathlib.Path(tempfile.gettempdir()) / "hf_cache")
 for var in (

@@ -41,5 +41,5 @@ def ideate_from_ids(ids: List[str]) -> Optional[str]:
         return None
 
     llm = load_pipe()
-    return llm(IDEA_PROMPT.format(context="\n".join(ctx)), max_new_tokens=300,
+    return llm(IDEA_PROMPT.format(context="\n".join(ctx)), max_new_tokens=500,
                do_sample=False)[0]['generated_text'].strip()
