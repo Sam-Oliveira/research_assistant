@@ -5,14 +5,14 @@ from db         import get_conn
 from typing import Optional,List
 from helpers   import rows_by_tag
 
-IDEA_PROMPT = textwrap.dedent("""\
-    You are a senior ML researcher. Using the CONTEXT, propose THREE fresh research projects.
-    For each give a new **Title**, one-sentence **Motivation**, two-sentence **Method idea**, and one-sentence **Evaluation method**.
-
-    ===CONTEXT===
-    {context}
-    ===PROJECT IDEAS===
-""")
+IDEA_PROMPT = (
+   " You are a senior ML researcher. Using the CONTEXT, propose THREE fresh research projects."
+    "For each give a new **Title**, one-sentence **Motivation**, two-sentence **Method idea**, "
+    "and one-sentence **Evaluation method**.\n"
+    "===CONTEXT===\n"
+    "{context}\n"
+    "===PROJECT IDEAS===\n"
+)
 
 # ---------------------------------------------------------------------- #
 def ideate_from_topic(topic: str, k: int = 8) -> Optional[str]:
@@ -22,7 +22,7 @@ def ideate_from_topic(topic: str, k: int = 8) -> Optional[str]:
 
     ctx  = "\n".join(f"- {t}: {s}" for t, _, s, _ in rows)
     llm  = load_pipe()
-    return llm(IDEA_PROMPT.format(ctx=ctx), max_new_tokens=300,
+    return llm(IDEA_PROMPT.format(context=ctx), max_new_tokens=300,
                do_sample=False)[0]['generated_text'].strip()
 
 # ------------------------------------------------------------------ #
@@ -41,5 +41,5 @@ def ideate_from_ids(ids: List[str]) -> Optional[str]:
         return None
 
     llm = load_pipe()
-    return llm(IDEA_PROMPT.format(ctx="\n".join(ctx)), max_new_tokens=300,
+    return llm(IDEA_PROMPT.format(context="\n".join(ctx)), max_new_tokens=300,
                do_sample=False)[0]['generated_text'].strip()
