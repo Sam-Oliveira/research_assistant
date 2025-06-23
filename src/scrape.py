@@ -5,13 +5,20 @@ from config import MAX_RESULTS
 from keybert import KeyBERT
 import os
 import pathlib
-CACHE_DIR = pathlib.Path(__file__).parent / "hf_cache"
-CACHE_DIR.mkdir(exist_ok=True)
 
-os.environ["HF_HOME"]           = str(CACHE_DIR)   # Hugging Face hub
-os.environ["HF_HUB_CACHE"]      = str(CACHE_DIR)
-os.environ["TRANSFORMERS_CACHE"] = str(CACHE_DIR)
-os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(CACHE_DIR)
+# 1) Prefer /data if it exists (HF Spaces), else ~/.cache, else /tmp
+if pathlib.Path("/data").exists():
+    CACHE_DIR = pathlib.Path("/data") / "hf_cache"
+else:
+    CACHE_DIR = pathlib.Path.home() / ".cache" / "hf_cache"
+
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+# 2) Tell all HF-related libs to use that folder
+os.environ["HF_HOME"]                     = str(CACHE_DIR)
+os.environ["HF_HUB_CACHE"]                = str(CACHE_DIR)
+os.environ["TRANSFORMERS_CACHE"]          = str(CACHE_DIR)
+os.environ["SENTENCE_TRANSFORMERS_HOME"]  = str(CACHE_DIR)
 
 
 _kw = KeyBERT("sentence-transformers/all-MiniLM-L6-v2",
