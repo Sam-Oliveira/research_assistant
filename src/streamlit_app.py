@@ -19,18 +19,19 @@ from helpers    import render_rows, rows_by_tag
 from db         import get_conn
 import os
 import subprocess
+from summarise     import summarise_by_tag
 
 def install(package):
     subprocess.check_call([os.sys.executable, "-m", "pip", "install", package])
 
 install("arxiv")
 
-st.set_page_config(page_title="Literature Scout", layout="wide")
+st.set_page_config(page_title="Research Assistant", layout="wide")
 tab1, tab2, tab3 = st.tabs(["🔍 Search", "📑 Digest", "💡 Ideate"])
 
 
 with tab1:
-    st.header("Search & ingest papers")
+    st.header("Search papers")
     c1, c2, c3, c4 = st.columns(4)
     topic    = c1.text_input("Topic")
     title    = c2.text_input("Title")
@@ -50,15 +51,15 @@ with tab1:
 
 
 with tab2:
-    st.header("Digest from local DB")
+    st.header("Get a digest from the latest papers you have previously scraped")
     d_topic = st.text_input("Keyword to match tags", value="large language")
     if st.button("Generate digest"):
-        summarise_pending()
+        summarise_by_tag(d_topic)
         rows = rows_by_tag(d_topic, MAX_RESULTS)
         st.components.v1.html(render_rows(rows), height=800, scrolling=True)
 
 with tab3:
-    st.header("Brainstorm new research ideas")
+    st.header("Brainstorm new research ideas based on previously scraped papers")
     mode = st.radio("Context source", ["Keyword", "ArXiv IDs"])
 
     if mode == "Keyword":

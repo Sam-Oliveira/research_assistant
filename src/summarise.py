@@ -1,6 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from db import get_conn
 from config import MODEL_NAME
+from helpers    import rows_by_tag 
 
 """ 
 Summarise the abstract of a paper using a LLM. Further versions should instead summarise the full paper.
@@ -30,16 +31,27 @@ def load_pipe():
         return_full_text=False,
     )
 
-# ---------------------------------------------------------------------- #
-def summarise_pending():
+
+def summarise_by_tag(keyword: str, limit: int = 10) -> int:
+    """
+    Generate summaries only for rows whose tags match `keyword`
+    AND whose summary is still NULL.
+    Returns number of rows updated.
+    """
     pipe = load_pipe()
     conn = get_conn()
+
+    # 1) get IDs + abstracts for matching rows with summary IS NULL
+    like = f"%{keyword.lower()}%"
     rows = conn.execute(
-        "SELECT id, abstract FROM papers WHERE summary IS NULL"
+        "SELECT id, abstract FROM papers "
+        "WHERE summary IS NULL AND LOWER(tags) LIKE ? "
+        "ORDER BY published DESC LIMIT ?", (like, limit)
     ).fetchall()
 
+    # 2) run the LLM only on those
     for pid, abstract in rows:
-        out = pipe(PROMPT.format(abstract=abstract), max_new_tokens=150)[0]["generated_text"]
+        out = pipe(PROMPT.format(abstract=abstract), max_new_tokens=150)[0]['generated_text']
         conn.execute("UPDATE papers SET summary=? WHERE id=?", (out.strip(), pid))
 
     conn.commit()

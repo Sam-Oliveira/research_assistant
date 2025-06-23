@@ -5,6 +5,7 @@ from config import MAX_RESULTS
 from keybert import KeyBERT
 import os
 import pathlib
+from sentence_transformers import SentenceTransformer
 
 os.environ["HF_HOME"]                    = "/data"
 os.environ["HF_HUB_CACHE"]               = "/data"
@@ -12,10 +13,13 @@ os.environ["TRANSFORMERS_CACHE"]         = "/data"
 os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/data"
 
 
-_kw = KeyBERT(
+st_model = SentenceTransformer(
     "sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={"cache_folder": "/data"}   # <- same writable path
+    cache_folder="/data"                 # <- writable
 )
+
+# 2) Hand it to KeyBERT
+kw_model = KeyBERT(st_model)
 
 def make_tags(title, abstract, top_n=5):
     """
